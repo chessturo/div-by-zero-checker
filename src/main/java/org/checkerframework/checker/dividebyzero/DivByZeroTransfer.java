@@ -127,6 +127,7 @@ public class DivByZeroTransfer extends CFTransfer {
                 return lhs;
             case TIMES:
                 if (equal(lhs, reflect(Zero.class)) || equal(rhs, reflect(Zero.class))) return reflect(Zero.class);
+                if (equal(lhs, reflect(NonZero.class)) || equal(rhs, reflect(NonZero.class))) return top();
 
                 if (equal(lhs, rhs)) return reflect(Positive.class);
                 else return reflect(Negative.class);
