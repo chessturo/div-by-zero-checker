@@ -72,7 +72,23 @@ public class DivByZeroTransfer extends CFTransfer {
             AnnotationMirror lhs,
             AnnotationMirror rhs) {
         // TODO
-        return lhs;
+        switch (operator) {
+            case EQ:
+                return rhs;
+            case LT:
+                if (equal(rhs, reflect(Zero.class))) return reflect(Negative.class);
+                return lhs;
+            case GT:
+                if (equal(rhs, reflect(Zero.class))) return reflect(Positive.class);
+                return lhs;
+            case NE:
+                if (equal(rhs, reflect(Zero.class))) return reflect(NonZero.class);
+                return lhs;
+            case LE:
+            case GE:
+                return lhs;
+        }
+        throw new IllegalStateException();
     }
 
     /**
@@ -93,8 +109,33 @@ public class DivByZeroTransfer extends CFTransfer {
             BinaryOperator operator,
             AnnotationMirror lhs,
             AnnotationMirror rhs) {
-        // TODO
-        return top();
+        if (equal(lhs, top()) || equal(rhs, top())) return top();
+        if (equal(lhs, bottom()) || equal(rhs, bottom())) return bottom();
+
+        switch (operator) {
+            case PLUS:
+                if (equal(lhs, reflect(Zero.class))) return rhs;
+                else if (equal(rhs, reflect(Zero.class))) return lhs;
+
+                if (!equal(lhs, rhs)) return top();
+                return lhs;
+            case MINUS:
+                if (equal(lhs, reflect(Zero.class))) return rhs;
+                else if (equal(rhs, reflect(Zero.class))) return lhs;
+
+                if (equal(lhs, rhs)) return top();
+                return lhs;
+            case TIMES:
+                if (equal(lhs, reflect(Zero.class)) || equal(rhs, reflect(Zero.class))) return reflect(Zero.class);
+
+                if (equal(lhs, rhs)) return reflect(Positive.class);
+                else return reflect(Negative.class);
+            case DIVIDE:
+                if (equal(rhs, reflect(Zero.class))) return reflect(Bot.class);
+                return top();
+            default:
+                return top();
+        }
     }
 
     // ========================================================================

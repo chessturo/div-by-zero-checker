@@ -1,5 +1,6 @@
 package org.checkerframework.checker.dividebyzero;
 
+import com.sun.tools.javac.tree.JCTree;
 import org.checkerframework.common.basetype.BaseTypeChecker;
 import org.checkerframework.common.basetype.BaseTypeVisitor;
 
@@ -30,7 +31,7 @@ public class DivByZeroVisitor extends BaseTypeVisitor<DivByZeroAnnotatedTypeFact
     private boolean errorAt(BinaryTree node) {
         // A BinaryTree can represent any binary operator, including + or -.
         if (DIVISION_OPERATORS.contains(node.getKind())) {
-            if (hasAnnotation(node.getRightOperand(), Top.class)) return true;
+            return hasAnnotation(node.getRightOperand(), Zero.class) || hasAnnotation(node.getRightOperand(), Top.class);
         }
         return false;
     }
@@ -45,7 +46,7 @@ public class DivByZeroVisitor extends BaseTypeVisitor<DivByZeroAnnotatedTypeFact
         // A CompoundAssignmentTree represents any binary operator combined with an assignment,
         // such as "x += 10".
         if (DIVISION_OPERATORS.contains(node.getKind())) {
-            if (hasAnnotation(node.getExpression(), Top.class)) return true;
+            return hasAnnotation(node.getExpression(), Zero.class) || hasAnnotation(node.getExpression(), Top.class);
         }
         return false;
     }
